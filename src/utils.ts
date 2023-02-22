@@ -217,6 +217,7 @@ export async function applyPeriodicTemplateToFile(
     format,
     templateContents
   );
+
   return app.vault.modify(file, renderedContents);
 }
 
@@ -330,4 +331,24 @@ export function getRelativeDate(granularity: Granularity, date: Moment) {
 export function isIsoFormat(format: string): boolean {
   const cleanFormat = removeEscapedCharacters(format);
   return /w{1,2}/.test(cleanFormat);
+}
+
+export function getMyFileName(date: Moment, granularity: string, format: string) {
+  if (granularity === "week") {
+    const monday: moment.Moment = getMyDate(date, granularity);
+    return monday.format(format);
+  }
+
+  return date.format(format);
+}
+
+export function getMyDate(date: Moment, granularity: string) {
+  if (granularity === "week") {
+    // 获取所在日期的所在周的周一的日期
+    const monday: moment.Moment = date.startOf('isoWeek').isoWeekday(1);
+    // console.log(monday.format('YYYY-MM-DD'));
+
+    return monday;
+  }
+  return date;
 }

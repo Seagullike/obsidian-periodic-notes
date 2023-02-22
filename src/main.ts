@@ -1,3 +1,4 @@
+import fs from 'fs';
 import type { Moment } from "moment";
 import { addIcon, Plugin, TFile } from "obsidian";
 import { writable, type Writable } from "svelte/store";
@@ -40,6 +41,8 @@ import TimelineManager from "./timeline/manager";
 import type { Granularity } from "./types";
 import {
   applyTemplateTransformations,
+  getMyDate,
+  getMyFileName,
   getNoteCreationPath,
   getTemplateContents,
   isMetaPressed,
@@ -215,7 +218,9 @@ export default class PeriodicNotesPlugin extends Plugin {
   ): Promise<TFile> {
     const config = this.calendarSetManager.getActiveConfig(granularity);
     const format = this.calendarSetManager.getFormat(granularity);
-    const filename = date.format(format);
+    date = getMyDate(date, granularity);
+    var filename = getMyFileName(date, granularity.trim(), format);//date.format(format);
+
     const templateContents = await getTemplateContents(this.app, config.templatePath);
     const renderedContents = applyTemplateTransformations(
       filename,
@@ -225,7 +230,17 @@ export default class PeriodicNotesPlugin extends Plugin {
       templateContents
     );
     const destPath = await getNoteCreationPath(this.app, filename, config);
-    return this.app.vault.create(destPath, renderedContents);
+    // console.log("destPath:" + destPath);
+    const fileExists = await this.app.vault.adapter.exists(destPath);
+    if (fileExists) {
+      // 文件存在
+      // console.log("destPath is exist");
+      return this.getPeriodicNote(granularity, date)!;
+    } else {
+      // 文件不存在
+      // console.log("destPath is not exist");
+      return this.app.vault.create(destPath, renderedContents);
+    }
   }
 
   public getPeriodicNote(granularity: Granularity, date: Moment): TFile | null {
@@ -276,7 +291,7 @@ export default class PeriodicNotesPlugin extends Plugin {
     let file = this.cache.getPeriodicNote(
       calendarSet ?? this.calendarSetManager.getActiveId(),
       granularity,
-      date
+      date, //getMyDate(date, granularity.trim())
     );
     if (!file) {
       file = await this.createPeriodicNote(granularity, date);

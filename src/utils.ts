@@ -343,11 +343,13 @@ export function getMyFileName(date: Moment, granularity: string, format: string)
 }
 
 export function getMyDate(date: Moment, granularity: string) {
+  // console.log("getMyDate::date:" + date);
   if (granularity === "week") {
     // 获取所在日期的所在周的周一的日期
     const monday: moment.Moment = date.startOf('isoWeek').isoWeekday(1);
     // console.log(monday.format('YYYY-MM-DD'));
 
+    // console.log("getMyDate::monday:" + monday);
     return monday;
   }
   return date;

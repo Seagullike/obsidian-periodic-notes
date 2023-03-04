@@ -288,12 +288,25 @@ export default class PeriodicNotesPlugin extends Plugin {
   ): Promise<void> {
     const { inNewSplit = false, calendarSet } = opts ?? {};
     const { workspace } = this.app;
-    let file = this.cache.getPeriodicNote(
-      calendarSet ?? this.calendarSetManager.getActiveId(),
-      granularity,
-      date, //getMyDate(date, granularity.trim())
-    );
+
+    // console.log("calendarSet ?? this.calendarSetManager.getActiveId():" + calendarSet ?? this.calendarSetManager.getActiveId());
+    // console.log("granularity:" + granularity)
+    // let file = this.cache.getPeriodicNote(
+    //   calendarSet ?? this.calendarSetManager.getActiveId(),
+    //   granularity,
+    //   getMyDate(date, granularity.trim()),
+    // );
+
+    const config = this.calendarSetManager.getActiveConfig(granularity);
+    const format = this.calendarSetManager.getFormat(granularity);
+    date = getMyDate(date, granularity);
+    var filename = getMyFileName(date, granularity.trim(), format);//date.format(format);
+    const destPath = await getNoteCreationPath(this.app, filename, config);
+    // console.log("destPath:" + destPath);
+    let file = this.app.vault.getAbstractFileByPath(destPath) as TFile; //this.getPeriodicNote(granularity, date)!;
+    // console.log("file:" + file);
     if (!file) {
+      // console.log("!file:true");
       file = await this.createPeriodicNote(granularity, date);
     }
 

@@ -357,7 +357,6 @@ export function getMyDate(date: Moment, granularity: string) {
 
 interface FileTreeAlternativePlugin extends Plugin {
   myCustomMethod: (file: TFile) => void;
-  // updateMyAtom: (file: TFile) => void;
 }
 
 export async function setActiveFile(app: App, file: TFile) {

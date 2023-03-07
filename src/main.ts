@@ -17,6 +17,8 @@ import {
   calendarWeekIcon,
   calendarQuarterIcon,
   calendarYearIcon,
+  myCalendarDayIcon,
+  myCalendarWeekIcon,
 } from "./icons";
 import { showFileMenu } from "./modal";
 import {
@@ -82,11 +84,11 @@ export default class PeriodicNotesPlugin extends Plugin {
     this.openPeriodicNote = this.openPeriodicNote.bind(this);
     this.addSettingTab(new PeriodicNotesSettingsTab(this.app, this));
 
-    addIcon("calendar-day", calendarDayIcon);
-    addIcon("calendar-week", calendarWeekIcon);
-    addIcon("calendar-month", calendarMonthIcon);
-    addIcon("calendar-quarter", calendarQuarterIcon);
-    addIcon("calendar-year", calendarYearIcon);
+    addIcon("mycalendar-day", myCalendarDayIcon);
+    addIcon("mycalendar-week", myCalendarWeekIcon);
+    addIcon("mycalendar-month", calendarMonthIcon);
+    addIcon("mycalendar-quarter", calendarQuarterIcon);
+    addIcon("mycalendar-year", calendarYearIcon);
 
     this.addCommand({
       id: "show-date-switcher",
@@ -130,26 +132,30 @@ export default class PeriodicNotesPlugin extends Plugin {
 
     const configuredGranularities = this.calendarSetManager.getActiveGranularities();
     if (configuredGranularities.length) {
-      const granularity = configuredGranularities[0];
-      const config = displayConfigs[granularity];
-      this.ribbonEl = this.addRibbonIcon(
-        `calendar-${granularity}`,
-        config.labelOpenPresent,
-        (e: MouseEvent) => {
-          if (e.type !== "auxclick") {
-            this.openPeriodicNote(granularity, window.moment(), {
-              inNewSplit: isMetaPressed(e),
-            });
+      for (let configuredGranularity of configuredGranularities) {
+        const granularity = configuredGranularity;    //configuredGranularities[0];
+        const config = displayConfigs[granularity];
+        const iconName = "mycalendar-" + granularity;
+
+        this.ribbonEl = this.addRibbonIcon(
+          iconName, //`calendar-${granularity}`,
+          config.labelOpenPresent,
+          (e: MouseEvent) => {
+            if (e.type !== "auxclick") {
+              this.openPeriodicNote(granularity, window.moment(), {
+                inNewSplit: isMetaPressed(e),
+              });
+            }
           }
-        }
-      );
-      this.ribbonEl.addEventListener("contextmenu", (e: MouseEvent) => {
-        e.preventDefault();
-        showFileMenu(this.app, this, {
-          x: e.pageX,
-          y: e.pageY,
+        );
+        this.ribbonEl.addEventListener("contextmenu", (e: MouseEvent) => {
+          e.preventDefault();
+          showFileMenu(this.app, this, {
+            x: e.pageX,
+            y: e.pageY,
+          });
         });
-      });
+      }
     }
   }
 
@@ -299,7 +305,6 @@ export default class PeriodicNotesPlugin extends Plugin {
     let file = this.app.vault.getAbstractFileByPath(destPath) as TFile; //this.getPeriodicNote(granularity, date)!;
     // console.log("file:" + file);
     if (!file) {
-      // console.log("!file:true");
       file = await this.createPeriodicNote(granularity, date);
     }
     setActiveFile(this.app, file);

@@ -46,6 +46,7 @@ import {
   getNoteCreationPath,
   getTemplateContents,
   isMetaPressed,
+  setActiveFile,
 } from "./utils";
 
 interface IOpenOpts {
@@ -289,14 +290,6 @@ export default class PeriodicNotesPlugin extends Plugin {
     const { inNewSplit = false, calendarSet } = opts ?? {};
     const { workspace } = this.app;
 
-    // console.log("calendarSet ?? this.calendarSetManager.getActiveId():" + calendarSet ?? this.calendarSetManager.getActiveId());
-    // console.log("granularity:" + granularity)
-    // let file = this.cache.getPeriodicNote(
-    //   calendarSet ?? this.calendarSetManager.getActiveId(),
-    //   granularity,
-    //   getMyDate(date, granularity.trim()),
-    // );
-
     const config = this.calendarSetManager.getActiveConfig(granularity);
     const format = this.calendarSetManager.getFormat(granularity);
     date = getMyDate(date, granularity);
@@ -309,7 +302,7 @@ export default class PeriodicNotesPlugin extends Plugin {
       // console.log("!file:true");
       file = await this.createPeriodicNote(granularity, date);
     }
-
+    setActiveFile(this.app, file);
     const leaf = inNewSplit ? workspace.splitActiveLeaf() : workspace.getUnpinnedLeaf();
     await leaf.openFile(file, { active: true });
   }

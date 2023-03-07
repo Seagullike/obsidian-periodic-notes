@@ -1,5 +1,5 @@
 import type { Moment } from "moment";
-import { normalizePath, App, Notice, Platform, TFile } from "obsidian";
+import { normalizePath, App, Notice, Platform, TFile, Plugin } from "obsidian";
 
 import type { PeriodicNoteCachedMetadata } from "./cache";
 import { DEFAULT_FORMAT, HUMANIZE_FORMAT } from "./constants";
@@ -353,4 +353,19 @@ export function getMyDate(date: Moment, granularity: string) {
     return monday;
   }
   return date;
+}
+
+interface FileTreeAlternativePlugin extends Plugin {
+  myCustomMethod: (file: TFile) => void;
+  // updateMyAtom: (file: TFile) => void;
+}
+
+export async function setActiveFile(app: App, file: TFile) {
+  //file-tree-alternative
+  const targetPluginId = 'file-tree-alternative'; // 需要调用的插件ID
+  const targetPlugin = (app.plugins.getPlugin(targetPluginId)) as unknown as FileTreeAlternativePlugin;
+
+  if (targetPlugin) {
+    targetPlugin.myCustomMethod(file); // 调用目标插件方法，并获取返回值
+  }
 }

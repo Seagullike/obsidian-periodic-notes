@@ -1,4 +1,3 @@
-import fs from 'fs';
 import type { Moment } from "moment";
 import { addIcon, Plugin, TFile } from "obsidian";
 import { writable, type Writable } from "svelte/store";
@@ -12,9 +11,7 @@ import CalendarSetManager, {
 } from "./calendarSetManager";
 import { displayConfigs, getCommands } from "./commands";
 import {
-  calendarDayIcon,
   calendarMonthIcon,
-  calendarWeekIcon,
   calendarQuarterIcon,
   calendarYearIcon,
   myCalendarDayIcon,
@@ -28,7 +25,6 @@ import {
   DEFAULT_PERIODIC_CONFIG,
 } from "./settings";
 import {
-  configureGlobalMomentLocale,
   initializeLocaleConfigOnce,
 } from "./settings/localization";
 import {
@@ -132,7 +128,7 @@ export default class PeriodicNotesPlugin extends Plugin {
 
     const configuredGranularities = this.calendarSetManager.getActiveGranularities();
     if (configuredGranularities.length) {
-      for (let configuredGranularity of configuredGranularities) {
+      for (const configuredGranularity of configuredGranularities) {
         const granularity = configuredGranularity;    //configuredGranularities[0];
         const config = displayConfigs[granularity];
         const iconName = "mycalendar-" + granularity;
@@ -226,7 +222,7 @@ export default class PeriodicNotesPlugin extends Plugin {
     const config = this.calendarSetManager.getActiveConfig(granularity);
     const format = this.calendarSetManager.getFormat(granularity);
     date = getMyDate(date, granularity);
-    var filename = getMyFileName(date, granularity.trim(), format);//date.format(format);
+    const filename = getMyFileName(date, granularity.trim(), format);//date.format(format);
 
     const templateContents = await getTemplateContents(this.app, config.templatePath);
     const renderedContents = applyTemplateTransformations(
@@ -293,13 +289,13 @@ export default class PeriodicNotesPlugin extends Plugin {
     date: Moment,
     opts?: IOpenOpts
   ): Promise<void> {
-    const { inNewSplit = false, calendarSet } = opts ?? {};
+    const { inNewSplit = false } = opts ?? {};
     const { workspace } = this.app;
 
     const config = this.calendarSetManager.getActiveConfig(granularity);
     const format = this.calendarSetManager.getFormat(granularity);
     date = getMyDate(date, granularity);
-    var filename = getMyFileName(date, granularity.trim(), format);//date.format(format);
+    const filename = getMyFileName(date, granularity.trim(), format);//date.format(format);
     const destPath = await getNoteCreationPath(this.app, filename, config);
     // console.log("destPath:" + destPath);
     let file = this.app.vault.getAbstractFileByPath(destPath) as TFile; //this.getPeriodicNote(granularity, date)!;
